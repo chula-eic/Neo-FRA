@@ -4,8 +4,8 @@ import errno
 
 HEADER_LENGTH = 10
 
-IP = "0.0.0.0"
-PORT = 8081
+IP = "127.0.0.1"
+PORT = 1234
 my_username = input("Username: ")
 
 # Create a socket

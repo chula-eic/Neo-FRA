@@ -24,8 +24,44 @@ def serial_write(s):
     ser.write(s.encode('utf-8'))
     return serial_read(t)
 
+######## Driving Function Start Here ########
+
+#There'll be function with speed as argument for manual control and function with unit(distance)
+#as an argument for auto control, speed and distance have range from -9999 to 9999
+def translation_vy(speed):
+    #forward and backward
+    #TODO
+
+def translation_vx(speed):
+    #left and right
+    #TODO
+
+def rotation_v(speed):
+    #TODO
+
+def translation_sy(distance):
+    #TODO
+
+def translation_sx(distance):
+    #TODO
+
+def rotation_s(distance):
+    #TODO
+
+def elevator(state):
+    #only for manual bot
+    if state == 0:
+        #go down
+    else:
+        #go up
+
+def grab(state):
+    #for end eff control
+    #state = 1 = grab, 0 = release
+
 
 def grab():
+    #legacy function
     print("Grabbing mango")
     if (serial_write("GRAB") == 'SUCCESS'):
         print('Grabbing success')
@@ -34,127 +70,7 @@ def grab():
         print("Grabbing error")
         return False
 
-
-def release():
-    print("Releasing mango")
-    if (serial_write("RELEASE") == 'SUCCESS'):
-        print("Releasing success")
-        return True
-    else:
-        print("Releasing error")
-        return False
-
-
-def cut():
-    print("Cutting wire")
-    if (serial_write("CUT") == 'SUCCESS'):
-        print('Cutting success')
-        return True
-    else:
-        print('Cutting error')
-        return False
-
-
-def forward():
-    print('Going Forward')
-    if (serial_write("FORWARD") == 'SUCCESS'):
-        print('Going forward, success')
-        return True
-    else:
-        print('Going forward, error')
-        return False
-
-
-def backward():
-    print('Going Backward')
-    if (serial_write("BACKWARD") == 'SUCCESS'):
-        print('Going backward, success')
-        return True
-    else:
-        print('Going backward, error')
-        return False
-
-
-def open():
-    print('Opening Catcher')
-    if (serial_write("OPEN_CATCHER") == 'SUCCESS'):
-        print('Open Catcher, success')
-        return True
-    else:
-        print('Open Catcher, error')
-        return False
-
-
-def close():
-    print('Closing Catcher')
-    if (serial_write("CLOSE_CATCHER") == 'SUCCESS'):
-        print('Close Catcher, success')
-        return True
-    else:
-        print('Close Catcher, error')
-        return False
-
-
-def stop():
-    print('Stopping')
-    if (serial_write("STOP") == 'SUCCESS'):
-        print('Stopping success')
-        return True
-    else:
-        print('Stopping error')
-        return False
-
-
-def is_cutting():
-    return config.isCutting
-
-
-def is_releasing():
-    return config.isReleasing
-
-
-def is_grabbing():
-    return config.isGrabbing
-
-
-def status():
-    return config.isReady
-
-
-# PORT = COM3, COM5 , ... somthing something lol
-# def serial_read(PORT):
-#     ser = serial.Serial(PORT, 38400, timeout=0.1)
-#     while True:
-#         if ser.isOpen():
-#             rl = ser.readline()
-#         else:
-#             print("Serial is not available")
-#             continue
-#         try:
-#             rl = rl.decode('utf-8')
-#         except UnicodeDecodeError:
-#             rl = str(rl)
-#         if(rl == 'DONE'):
-#             return
-def setToReleasing():
-    config.isReleasing = True
-    config.isCutting, config.isGrabbing, config.isReady = False, False, False
-
-
-def setToGrabbing():
-    config.isGrabbing = True
-    config.isCutting, config.isReleasing, config.isReady = False, False, False
-
-
-def setToCutting():
-    config.isCutting = True
-    config.isGrabbing, config.isReleasing, config.isReady = False, False, False
-
-
-def setToDefault():
-    config.isCutting, config.isGrabbing, config.isReleasing = False, False, False
-    config.isReady = True
-
+######## End of Driving function ########
 
 def serial_read(cmd=""):
     global ser
