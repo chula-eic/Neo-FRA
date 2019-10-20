@@ -1,48 +1,42 @@
+
 import cv2
-import numpy as np
 import socket
-import errno
+import struct
+import pickle
+from picamera.array import PiRGBArray
+from picamera import PiCamera
+import time
+camera = PiCamera()
+camera.resolution = (320, 240)
+rawCapture = PiRGBArray(camera)
 
-HEADER_LENGTH = 10
-
-IP = "0.0.0.0"
-PORT = 8081
-my_username = 'pi1'
-
-# Create a socket
-# socket.AF_INET - address family, IPv4, some otehr possible are AF_INET6, AF_BLUETOOTH, AF_UNIX
-# socket.SOCK_STREAM - TCP, conection-based, socket.SOCK_DGRAM - UDP, connectionless, datagrams, socket.SOCK_RAW - raw IP packets
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('192.168.2.38', 8080))
+connection = client_socket.makefile('wb')
 
-# Connect to a given ip and port
-client_socket.connect((IP, PORT))
 
-# Set connection to non-blocking state, so .recv() call won;t block, just return some exception we'll handle
-client_socket.setblocking(False)
+#image = rawCapture.array
+#cam = cv2.VideoCapture(0)
 
-# Prepare username and header and send them
-# We need to encode username to bytes, then count number of bytes and prepare header of fixed size, that we encode to bytes as well
-username = my_username.encode('utf-8')
-username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
-client_socket.send(username_header + username)
+#cam.set(3, 320);
+#cam.set(4, 240);
 
-cap = cv2.VideoCapture(0)
+img_counter = 0
 
-cap.set(3, 320);
-cap.set(4, 240);
+encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 
-while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+while True:
+    #ret, frame = cam.read()
+    camera.capture(rawCapture, format="bgr")
+    frame = rawCapture.array
+    result, frame = cv2.imencode('.jpg', frame, encode_param)
+#    data = zlib.compress(pickle.dumps(frame, 0))
+    data = pickle.dumps(frame, 0)
+    size = len(data)
 
-    # Our operations on the frame come here
-    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Display the resulting frame
-    cv2.imshow('frame',frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    print("{}: {}".format(img_counter, size))
+    client_socket.sendall(struct.pack(">L", size) + data)
+    img_counter += 1
 
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+cam.release()

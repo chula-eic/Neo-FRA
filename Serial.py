@@ -1,3 +1,6 @@
+#I'll be assuming that return value = 1 mean it's 'ready' for another command.
+#and 0 for 'not ready'
+
 import serial
 
 PORT = '/dev/ttyACM0'
@@ -8,10 +11,10 @@ def setup():
     global ser
     ser = serial.Serial(PORT, 115200, timeout=1)
     st = serial_read()
-    if (st[-1] == '\n'):
+    if st[-1]=='\n':
         st = st[:-1]
 
-    while (not st == "SETUP DONE"):
+    while not st == "1":
         st = serial_read()
     print("*" + st)
 

@@ -1,60 +1,41 @@
 import socket
-import select
 import cv2
+import pickle
+import struct ## new
 
-HEADER_LENGTH = 10
-
-IP = "0.0.0.0"
+HOST = '0.0.0.0'
 PORT = 8080
 
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+print('Socket created')
 
-server_socket.bind((IP, PORT))
-server_socket.listen()
+s.bind((HOST, PORT))
+print('Socket bind complete')
+s.listen(10)
+print('Socket now listening')
 
-sockets_list = [server_socket]
-clients = dict()
+conn, addr = s.accept()
 
-print(f'Listening for connections on {IP}:{PORT}...')
-print('host: '+socket.gethostname())
+data = b""
+payload_size = struct.calcsize(">L")
+print("payload_size: {}".format(payload_size))
+while True:
+    while len(data) < payload_size:
+        print("Recv: {}".format(len(data)))
+        data += conn.recv(4096)
 
-def receive_message(client_socket):
-    try:
-        message_header = client_socket.recv(HEADER_LENGTH)
-        if not len(message_header):
-            return False
-        message_length = int(message_header.decode('utf-8').strip())
-        return {'header': message_header, 'data': client_socket.recv(message_length)}
-    except:
-        return False
+    print("Done Recv: {}".format(len(data)))
+    packed_msg_size = data[:payload_size]
+    data = data[payload_size:]
+    msg_size = struct.unpack(">L", packed_msg_size)[0]
+    print("msg_size: {}".format(msg_size))
+    while len(data) < msg_size:
+        data += conn.recv(4096)
+    frame_data = data[:msg_size]
+    data = data[msg_size:]
 
-while(1):
-    read_sockets, _, exception_sockets = select.select(sockets_list, [], sockets_list)
-
-    for notified_socket in read_sockets:
-        if notified_socket == server_socket:
-            client_socket, client_address = server_socket.accept()
-            user = receive_message(client_socket)
-            if user is False:
-                continue
-            sockets_list.append(client_socket)
-            clients[client_socket] = user
-            print('Accepted new connection from {}:{}, username: {}'.format(*client_address, user['data'].decode(('utf-8'))))
-        else:
-            message = receive_message(notified_socket)
-            if message is False:
-                print('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
-                sockets_list.remove(notified_socket)
-                del clients[notified_socket]
-                continue
-
-            user = clients[notified_socket]
-            print(f'Received message from {user["data"].decode("utf-8")}: {message["data"].decode("utf-8")}')
-
-            for client_socket in clients:
-                if client_socket != notified_socket:
-                    client_socket.send(user['header'] + user['data'] + message['header'] + message['data'])
-    for notified_socket in exception_sockets:
-        sockets_list.remove(notified_socket)
-        del clients[notified_socket]
+    frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+    cv2.imshow('ImageWindow',frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
