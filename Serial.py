@@ -2,56 +2,74 @@
 #and 0 for 'not ready'
 
 import serial
+import time
 
 PORT = '/dev/ttyACM0'
 ser = None
 
-
+##### THIS IS IMPORTANT PLEASE SEND 1 FROM ARDUINO FIRST TO CONFIRM CONNECTION (or remove it from setup)######
 def setup():
     global ser
     ser = serial.Serial(PORT, 115200, timeout=1)
     st = serial_read()
-    if st[-1]=='\n':
-        st = st[:-1]
-
     while not st == "1":
-        st = serial_read()
-    print("*" + st)
+        st = serial_read()  #wait "1" from arduino to confirm connection
+    print("Setup done")     
 
 
 def serial_write(s):
-    t = s
     global ser
     if ser is None:
         return "Error"
-    ser.write(s.encode('utf-8'))
-    return serial_read(t)
+    ser.write(s.encode())
+    return serial_read()
+#write data and returns the feedback msg from arduino
 
 ######## Driving Function Start Here ########
+
 
 #There'll be function with speed as argument for manual control and function with unit(distance)
 #as an argument for auto control, speed and distance have range from -9999 to 9999
 def translation_vy(speed):
+    if speed>0:
+        serial_write(str([0,1,0,speed]))
+    else:
+        serial_write(str([0,0,0,speed]))
     #forward and backward
-    #TODO
 
 def translation_vx(speed):
-    #left and right
-    #TODO
+    if speed>0:
+        serial_write(str([1,1,0,speed]))
+    else:
+        serial_write(str([1,0,0,speed]))
+    #right and left
 
 def rotation_v(speed):
-    #TODO
+    if speed>0:
+        serial_write(str([2,1,0,speed]))
+    else:
+        serial_write(str([2,0,0,speed]))
+    #cw and ccw
 
 def translation_sy(distance):
-    #TODO
+    if speed>0:
+        serial_write(str([0,1,1,distance]))
+    else:
+        serial_write(str([0,0,1,distance]))
 
 def translation_sx(distance):
-    #TODO
-
+    if speed>0:
+        serial_write(str([1,1,1,distance]))
+    else:
+        serial_write(str([1,0,1,distance]))
+        
 def rotation_s(distance):
-    #TODO
+    if speed>0:
+        serial_write(str([2,1,1,distance]))
+    else:
+        serial_write(str([2,0,1,distance]))
 
-def elevator(state):
+"""def elevator(state):
     #only for manual bot
     if state == 0:
         #go down
@@ -60,24 +78,23 @@ def elevator(state):
 
 def grab(state):
     #for end eff control
-    #state = 1 = grab, 0 = release
+    #state = 1 = grab, 0 = release"""
+#TODO
 
-
-def grab():
-    #legacy function
+"""def grab():
     print("Grabbing mango")
     if (serial_write("GRAB") == 'SUCCESS'):
         print('Grabbing success')
         return True
     else:
         print("Grabbing error")
-        return False
+        return False"""
+#legacy function
 
 ######## End of Driving function ########
 
-def serial_read(cmd=""):
+def serial_read():
     global ser
-
     while True:
         if ser.isOpen():
             rl = ser.readline()
@@ -88,28 +105,35 @@ def serial_read(cmd=""):
             rl = rl.decode('utf-8')
         except UnicodeDecodeError:
             rl = str(rl)
-        if (rl == "DONE"):
-            print('Done')
-            setToDefault()
-            return 'SUCCESS'
-        elif (rl == "GOING FORWARD" or rl == "GOING BACKWARD" or rl == "STOPPED"):
-            print('DONE')
-            return ('SUCCESS')
-        elif (rl == 'RELEASING'):
-            setToReleasing()
-        elif (rl == 'CUTTING'):
-            setToCutting()
-        elif (rl == 'GRABBING'):
-            setToGrabbing()
-        elif (rl == "SETUP DONE"):
-            return rl
-        elif (rl == ""):
-            pass
-        else:
-            print('msg recieve=' + rl)
-            setToDefault()
-            return rl
-
-
+            print("UDE")
+        if len(rl)>0:
+            rl = rl.strip()
+        print("Recieved: "+rl)
+        return rl
+#reads line, returns the data after printing it on the console
+    
 if __name__ == '__main__':
     setup()
+
+
+#for arduino, use println(String) to communicate. Following codes is for echo
+"""
+char data;
+char str[2];
+void setup() {
+  Serial.begin(115200);
+  str[1] = '\0';
+  pinMode(13,OUTPUT);
+  digitalWrite(13,LOW);
+  Serial.println("1"); //tell py set up is done
+}
+
+void loop() {
+  if(Serial.available() > 0) {
+    data = Serial.read();
+    str[0] = data;
+    Serial.print(str);
+  }
+  Serial.flush();
+}
+"""
