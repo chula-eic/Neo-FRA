@@ -1,10 +1,14 @@
-import pygame, Serial
+import pygame, socket
 
 #----Define------
-LIFT_UP = 1
-LIFT_DOWN = 0
+LIFT_UP = [1]
+LIFT_DOWN = [0]
 MAX_SPEED = 9999
 NOISE = 0.001
+
+MOVE_X = [0,0]
+MOVE_Y = [1,0]
+ROTATE = [2,0]
 #----------------
 
 class JoyHandler(object):
@@ -13,14 +17,20 @@ class JoyHandler(object):
     def __init__(self):
         pygame.init()
         pygame.joystick.init()
-        self.func = {}
         self.speed = MAX_SPEED//2
         self.joystick_count = pygame.joystick.get_count()
-        self.func['move_y'] = Serial.translation_vy
-        self.func['move_x'] = Serial.translation_vx
-        self.func['rotate'] = Serial.rotation_v
-        self.func['lift'] = Serial.elevator
 
+
+    def send(self, comm):
+        if len(comm) > 1:
+            comm[1] = int(comm[1])
+            if(comm[1] > 255):
+                comm[1] -= 1
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect(('localhost', 6969))
+        sock.send(bytes(comm))
+        sock.close()
+        
 
     def handle_joy(self):
         
@@ -53,25 +63,31 @@ class JoyHandler(object):
         
         if(action_type == 'hat'):
             if value[0] == 1: #hat 2
-                self.func['move_x'](self.speed)
+                MOVE_X[1] = self.speed * 128 // MAX_SPEED + 128
+                self.send(MOVE_X)
             elif value[0] == -1: #hat 4
-                self.func['move_x'](-self.speed)
+                MOVE_X[1] = -self.speed * 128 // MAX_SPEED + 128
+                self.send(MOVE_X)
             if value[1] == 1: #hat 1
-                self.func['move_y'](self.speed)
+                MOVE_Y[1] = self.speed * 128 // MAX_SPEED + 128
+                self.send(MOVE_Y)
             elif value[1] == -1: #hat 3
-                self.func['move_y'](-self.speed)
+                MOVE_Y[1] = -self.speed * 128 // MAX_SPEED + 128
+                self.send(MOVE_Y)
                 
         elif(action_type == 'button'):
             if (key < 4):
                 if key == 0:
-                    self.func['lift'](LIFT_UP)
+                    self.send(LIFT_UP)
                 elif key == 2:
-                    self.func['lift'](LIFT_DOWN)
+                    self.send(LIFT_DOWN)
                 else:
                     if key == 1:
-                        self.func['rotate'](self.speed)
+                        ROTATE[1] = self.speed * 128 // MAX_SPEED + 128
+                        self.send(ROTATE)
                     elif key == 3:
-                        self.func['rotate'](-self.speed)
+                        ROTATE[1] = -self.speed * 128 // MAX_SPEED + 128
+                        self.send(ROTATE)
             elif ( key % 2 == 1 ):
                 self.speed += (key-1)*100
                 if self.speed > MAX_SPEED:
@@ -90,11 +106,17 @@ class JoyHandler(object):
             elif value < -MAX_SPEED:
                 value = -MAX_SPEED
             if key == 0:
-                self.func['move_x'](value)
+                MOVE_X[1] = value * 128 // MAX_SPEED + 128
+                self.send(MOVE_X)
             elif key == 1:
-                self.func['move_y'](-value)
+                MOVE_Y[1] = -value * 128 // MAX_SPEED + 128
+                self.send(MOVE_Y)
             elif key == 2:
-                self.func['rotate'](value)
+                ROTATE[1] = value * 128 // MAX_SPEED + 128
+                self.send(ROTATE)
+
+
+        
                 
 
 def init():
@@ -108,3 +130,4 @@ def init():
 def handle():
     global JoyHandler
     JoyHandler.handle_joy()
+
