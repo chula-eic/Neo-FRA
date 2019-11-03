@@ -4,7 +4,7 @@ import pickle
 import struct ## new
 
 HOST = '0.0.0.0'
-PORT = 8080
+PORT = 8554
 
 s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 print('Socket created')
