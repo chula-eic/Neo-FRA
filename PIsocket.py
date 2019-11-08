@@ -1,64 +1,60 @@
-import multiprocessing
 import socket
 import time
 import Serial
+import json
 
 
-def handle(connection, address):
-    
-    try:
-        
-        while True:
-            
-            data = connection.recv(1024)
-            
-            if data != b'':
-                data = list(data)
-
-                if len(data) == 2:
-                    
-                    speed = (data[1]-128)*9999/128
-                    
-                    if data[0] == 0:
-                        Serial.translation_vx(speed)
-                    elif data[0] == 1:
-                        Serial.translation_vy(speed)
-                    else:
-                        Serial.rotation_v(speed)
-                        
-                elif data[0] == 0:
-                    Serial.elevator(0)
-                else:
-                    Serial.elevator(1)
-                
-                break
-    except:
-        pass
-    
-    finally:
-        connection.close()
-
-
-class Server(object):
+class Client(object):
 
     def __init__(self, hostname, port):
         self.hostname = hostname
         self.port = port
 
     def start(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((self.hostname, self.port))
-        self.socket.listen(1)
 
         while True:
-            conn, address = self.socket.accept()
-            process = multiprocessing.Process(
-                target=handle(conn, address))
-            process.daemon = True
-            process.start()
+
+            
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((self.hostname,self.port))
+
+            
+            data = json.loads(sock.recv(1024).decode("utf-8"))
+
+            moving = 1
+            rotation = 1
+
+            if data['hats'][0] == [0,0] and data['axes'][0] == 0 and data['axes'][1] == 0:
+                moving = 0
+            if data['button'][1] == 0 and data['button'][3] == 0 and data['axes'][2] == 0 and data['axes'][3] == 0:
+                rotation = 0
+
+            if moving:
+                if data['hats'][0] != [0,0]:
+                    #call func 2 func
+                else:
+                    #call func 2 func
+                    #data['axes'][0] for x
+                    #data['axes'][1] for y
+
+            if rotation:
+                if data['button'][1] != 0 or data['button'][3] != 0:
+                    #call func rotate
+                else:
+                    #call func rotate
+                        
+            if data['button'][0]:
+                #call lift up
+            elif data['button'][2]:
+                #call lift down
+
+                    
+            sock.close()
 
 
 def init():
     
-    ser = Server('localhost', 6969)
-    ser.start()
+    pi = Client('localhost', 6969)
+    pi.start()
+
+init()
