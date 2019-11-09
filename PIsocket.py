@@ -1,7 +1,4 @@
-import socket
-import time
-import Serial
-import json
+import socket, time, Serial, json
 
 
 class Client(object):
@@ -60,6 +57,8 @@ class Client(object):
                 if elevator:       
                     if data['button']['0']:
                         Serial.elevator(1)
+                    elif data['button']['2']:
+                        Serial.elevator(-1)
                     else:
                         Serial.elevator(0)
             except:
@@ -71,7 +70,7 @@ class Client(object):
 
 def init():
     
-    pi = Client('localhost', 6969)
+    pi = Client('192.168.56.1', 6783)
     pi.start()
 
 init()
