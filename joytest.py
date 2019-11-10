@@ -1,4 +1,4 @@
-import pygame, socket, time, json
+import pygame, socket, time, json, Serial
 
 # ----Define------
 MAX_SPEED = 999
@@ -7,22 +7,7 @@ NOISE = 0.001
 
 # ----------------
 
-def handleCon(con, addr, joy):
-    try:
 
-        joy.handle_joy()
-
-        data = bytes(json.dumps(joy.event), encoding='utf8')
-        print(data)
-        con.send(data)
-
-
-    except:
-        pass
-
-    finally:
-        time.sleep(0.1)
-        con.close()
 
 
 class JoyHandler(object):
@@ -30,7 +15,7 @@ class JoyHandler(object):
     def __init__(self):
         pygame.init()
         pygame.joystick.init()
-        self.speed = MAX_SPEED
+        self.speed = MAX_SPEED // 2
         self.event = {}
         self.count = 0
         self.joystick_count = pygame.joystick.get_count()
@@ -59,10 +44,19 @@ class JoyHandler(object):
             buttons = joystick.get_numbuttons()
             self.event['button'] = {}
             for but_num in range(buttons):
-                if but_num >= 4:
+                if but_num < 4:
                     if but_num % 2 == 1:
+                        self.event['button'][but_num] = joystick.get_button(but_num) * self.speed
+                    else:
                         self.event['button'][but_num] = joystick.get_button(but_num)
-
+                elif but_num % 2 == 1 and joystick.get_button(but_num) == 1:
+                    self.speed -= 50
+                    if self.speed < 0:
+                        self.speed = 0
+                elif but_num % 2 == 0 and joystick.get_button(but_num) == 1:
+                    self.speed += 50
+                    if self.speed > MAX_SPEED:
+                        self.speed = MAX_SPEED
                 #self.event['button'][but_num] = int(self.event['button'][but_num])
 
             hats = joystick.get_numhats()
@@ -72,26 +66,12 @@ class JoyHandler(object):
                 for hat in self.event['hats'][hat_num]:
                     self.event['hats'][hat_num][hat] *= self.speed
                     #self.event['hats'][hat_num][hat] = int(self.event['hats'][hat_num][hat])
-
-
-class Server(object):
-
-    def __init__(self, hostname, port, joy):
-        self.hostname = hostname
-        self.port = port
-        self.joy = joy
-
-    def start(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.bind((self.hostname, self.port))
-        self.socket.listen(1)
-
-        while True:
-            conn, address = self.socket.accept()
-            handleCon(conn, address, self.joy)
-
+            print(joystick.get_axis(2))
+            Serial.translation(int(self.event['axes'][0]*1.5), int(self.event['axes'][1]*1.5), self.event['axes'][2])
 
 if __name__ == "__main__":
+    Serial.setup()
     JoyHandler = JoyHandler()
-    ser = Server('0.0.0.0', 6783, JoyHandler)
-    ser.start()
+    while(1):
+        JoyHandler.handle_joy()
+        #time.sleep(0.1)

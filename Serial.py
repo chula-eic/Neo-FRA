@@ -2,9 +2,11 @@
 #and 0 for 'not ready'
 
 import serial
-#import time
+import time
+
 
 PORT = '/dev/ttyACM0'
+
 ser = None
 
 
@@ -129,11 +131,13 @@ def serial_read():
         print("Recieved: "+rl)
         return rl'''
 #reads line, returns the data after printing it on the console
-    
+
 if __name__ == '__main__':
     setup()
-    x, y, z = [int(e) for e in input().strip().split()]
-    translation(x,y,z)
+
+    while 1:
+        x, y, z = [int(e) for e in input().strip().split()]
+        translation(x,y,z)
 
 
 #for arduino, use println(String) to communicate. Following codes is for echo

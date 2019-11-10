@@ -23,14 +23,19 @@ class Client(object):
                 x = 0
                 y = 0
                 z = 0
-                
+
 
                 if data['hats']['0'] == [0,0] and data['axes']['0'] == 0 and data['axes']['1'] == 0:
                     moving = 0
-                if data['button']['1'] == 0 and data['button']['3'] == 0 and data['axes']['2'] == 0 and data['axes']['3'] == 0:
+                if data['axes']['2'] == 0:
                     rotation = 0
-                if data['button']['0'] == 0 and data['button']['2'] == 0:
+                if data['button']['5'] == 0 and data['button']['7'] == 0:
                     elevator = 0
+
+                if data['button']['4'] == 1:
+                    Serial.gripper(0)
+                if data['button']['6'] == 1:
+                    Serial.gripper(1)
 
                 
                 if moving:
@@ -58,9 +63,9 @@ class Client(object):
                     z = 0
                 Serial.translation(x, y, z)
                 if elevator:       
-                    if data['button']['0']:
+                    if data['button']['5']:
                         Serial.elevator(1)
-                    elif data['button']['2']:
+                    elif data['button']['7']:
                         Serial.elevator(-1)
                     else:
                         Serial.elevator(0)
