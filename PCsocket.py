@@ -1,4 +1,4 @@
-import pygame, socket, time, json
+import pygame, socket, json
 
 # ----Define------
 MAX_SPEED = 999
@@ -13,7 +13,7 @@ def handleCon(con, addr, joy):
         joy.handle_joy()
 
         data = bytes(json.dumps(joy.event), encoding='utf8')
-        print(data)
+        #print(data)
         con.send(data)
 
 
@@ -21,7 +21,6 @@ def handleCon(con, addr, joy):
         pass
 
     finally:
-        time.sleep(0.1)
         con.close()
 
 
@@ -59,9 +58,8 @@ class JoyHandler(object):
             buttons = joystick.get_numbuttons()
             self.event['button'] = {}
             for but_num in range(buttons):
-                if but_num >= 4:
-                    if but_num % 2 == 1:
-                        self.event['button'][but_num] = joystick.get_button(but_num)
+                if 4 <= but_num < 8:
+                    self.event['button'][but_num] = joystick.get_button(but_num)
 
                 #self.event['button'][but_num] = int(self.event['button'][but_num])
 
