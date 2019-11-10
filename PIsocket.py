@@ -1,4 +1,4 @@
-import socket, time, Serial, json
+import socket, Serial, json
 
 class Client(object):
 

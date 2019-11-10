@@ -11,7 +11,7 @@ ser = None
 def setup():
     global ser
     ser = serial.Serial(PORT, 115200, timeout=1)
-    time.sleep(0.6)        #wait for arduino to setup, not really neccessary
+    #time.sleep(0.6)        #wait for arduino to setup, not really neccessary
     ser.close()
     #st = serial_read()
     #while not st == "1":
