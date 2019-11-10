@@ -2,7 +2,7 @@
 #and 0 for 'not ready'
 
 import serial
-import time
+#import time
 
 PORT = '/dev/ttyACM0'
 ser = None
@@ -10,8 +10,9 @@ ser = None
 
 def setup():
     global ser
-    
+    ser = serial.Serial(PORT, 115200, timeout=1)
     time.sleep(0.6)        #wait for arduino to setup, not really neccessary
+    ser.close()
     #st = serial_read()
     #while not st == "1":
     #    st = serial_read()  #wait "1" from arduino to confirm connection
