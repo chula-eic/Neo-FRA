@@ -4,13 +4,13 @@
 import serial
 import time
 
-PORT = 'COM12'
+PORT = '/dev/ttyACM0'
 ser = None
 
 
 def setup():
     global ser
-    ser = serial.Serial(PORT, 115200, timeout=1)
+    
     time.sleep(0.6)        #wait for arduino to setup, not really neccessary
     #st = serial_read()
     #while not st == "1":
@@ -19,12 +19,13 @@ def setup():
 
 
 def serial_write(s):
-    global ser
+    ser = serial.Serial(PORT, 115200, timeout=1)
     if ser is None:
         return "Error"
     print(s.encode())
     ser.write(s.encode())
-    return serial_read()
+    ser.close()
+    #return serial_read()
 #write data and returns the feedback msg from arduino
 
 ######## Driving Function Start Here ########
@@ -43,8 +44,8 @@ def translation(x,y,z):
             d = str(d)[1:]
             d = "1"+"0"*(3-len(d))+d
         cmd = cmd+d
-    #serial_write("!"+cmd)
-    print("!" + cmd)
+    serial_write("!"+cmd)
+    #print("!" + cmd)
 #legacy translation function
 
 '''def translation_vy(speed):

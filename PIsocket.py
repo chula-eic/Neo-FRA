@@ -9,12 +9,12 @@ class Client(object):
     def start(self):
 
         while True:
-            
+            #time.sleep(0.5)
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                print("establishing connection")
+                #print("establishing connection")
                 sock.connect((self.hostname,self.port))
-                print('conected!')
+                #print('conected!')
                 data = json.loads(sock.recv(1024).decode("utf-8"))
                 
                 moving = 1
@@ -69,12 +69,12 @@ class Client(object):
 
             finally:
                 sock.close()
-            time.sleep(1)
+    
 
 
 def init():
     print('start')
-    #Serial.setup()
+    Serial.setup()
     pi = Client('172.16.0.126', 6783)
     pi.start()
     
