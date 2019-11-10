@@ -1,12 +1,4 @@
-print('importing')
-import socket
-print('imported socket')
-import time
-print('imported time')
-import Serial
-print('imported Serial')
-import json
-print('done import')
+import socket, time, Serial, json
 
 class Client(object):
 
@@ -17,17 +9,21 @@ class Client(object):
     def start(self):
 
         while True:
+            
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 print("establishing connection")
                 sock.connect((self.hostname,self.port))
                 print('conected!')
                 data = json.loads(sock.recv(1024).decode("utf-8"))
-
+                
                 moving = 1
                 rotation = 1
                 elevator = 1
-
+                x = 0
+                y = 0
+                z = 0
+                
 
                 if data['hats']['0'] == [0,0] and data['axes']['0'] == 0 and data['axes']['1'] == 0:
                     moving = 0
@@ -36,42 +32,44 @@ class Client(object):
                 if data['button']['0'] == 0 and data['button']['2'] == 0:
                     elevator = 0
 
-
+                
                 if moving:
                     if data['hats']['0'] != [0,0]:
-                        Serial.translation_vx(data['hats']['0'][0])
-                        Serial.translation_vy(data['hats']['0'][1])
+                        x = data['hats']['0'][0]
+                        y = data['hats']['0'][1]
                     else:
-                        Serial.translation_vx(data['axes']['0'])
-                        Serial.translation_vy(data['axes']['1'])
+                        x = data['axes']['0']
+                        y = data['axes']['1']
 
                 else:
-                    Serial.translation_vx(0)
-                    Serial.translation_vy(0)
+                    x = 0
+                    y = 0
 
 
                 if rotation:
                     if data['button']['1'] != 0 or data['button']['3'] != 0:
                         if data['button']['1'] != 0:
-                            Serial.rotation_v(data['button']['1'])
+                            z = data['button']['1']
                         else:
-                            Serial.rotation_v((data['button']['3']*(-1)))
+                            z = data['button']['3']*(-1)
                     else:
-                        Serial.rotation_v(data['axes']['2'])
+                        z = data['axes']['2']
                 else:
-                    Serial.rotation_v(0)
-
-
+                    z = 0
+                Serial.translation(x, y, z)
                 if elevator:       
                     if data['button']['0']:
                         Serial.elevator(1)
+                    elif data['button']['2']:
+                        Serial.elevator(-1)
                     else:
                         Serial.elevator(0)
-            except:
-                pass
+            except Exception as e:
+                print(e)
 
             finally:
                 sock.close()
+            time.sleep(1)
 
 
 def init():
@@ -80,4 +78,5 @@ def init():
     pi = Client('172.16.0.126', 6783)
     pi.start()
     
-init()
+if __name__ == "__main__":
+    init()

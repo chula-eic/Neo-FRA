@@ -1,14 +1,9 @@
 import pygame, socket, time, json
 
 #----Define------
-LIFT_UP = [1]
-LIFT_DOWN = [0]
 MAX_SPEED = 9999
 NOISE = 0.001
 
-MOVE_X = [0,0]
-MOVE_Y = [1,0]
-ROTATE = [2,0]
 #----------------
 
 def handleCon(con,addr):
@@ -18,7 +13,7 @@ def handleCon(con,addr):
         global JoyHandler
 
         JoyHandler.handle_joy()
-
+        
         data = bytes(json.dumps(JoyHandler.event), encoding='utf8')
         con.send(data)
     
@@ -72,11 +67,11 @@ class JoyHandler(object):
                     else:
                         self.event['button'][but_num] = joystick.get_button(but_num)
                 elif but_num % 2 == 1 and joystick.get_button(but_num) == 1:
-                    self.speed -= 10
+                    self.speed -= 50
                     if self.speed < 0:
                         self.speed = 0
                 elif but_num % 2 == 0 and joystick.get_button(but_num) == 1:
-                    self.speed += 10
+                    self.speed += 50
                     if self.speed > MAX_SPEED:
                         self.speed = MAX_SPEED
                 
@@ -85,7 +80,7 @@ class JoyHandler(object):
             for hat_num in range(hats):
                 self.event['hats'][hat_num] = list(joystick.get_hat(hat_num))
                 for hat in self.event['hats'][hat_num]:
-                    self.event['hats'][hat_num][hat] *= MAX_SPEED
+                    self.event['hats'][hat_num][hat] *= self.speed
                     
     
 
@@ -106,17 +101,8 @@ class Server(object):
                     
 
         
-                
-
-def init():
-    global JoyHandler
+if __name__ == "__main__":
     JoyHandler = JoyHandler()
-    ser = Server('localhost', 6969)
+    ser = Server('0.0.0.0', 6783)
     ser.start()
-    if(JoyHandler.joystick_count == 0):
-        print("No joystick found!")
-        exit(1)
-
-init()
-
 

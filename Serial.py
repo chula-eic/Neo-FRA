@@ -43,23 +43,23 @@ def translation(x,y,z):
             d = str(d)[1:]
             d = "1"+"0"*(3-len(d))+d
         cmd = cmd+d
-    serial_write("!"+cmd)
-#Main translation function
+    #serial_write("!"+cmd)
+    print("!" + cmd)
+#legacy translation function
 
-def translation_vy(speed):
+'''def translation_vy(speed):
     if speed>0:
         serial_write(str([0,1,0,speed]))
     else:
         serial_write(str([0,0,0,speed]))
     #forward and backward
-
+#
 def translation_vx(speed):
     if speed>0:
         serial_write(str([1,1,0,speed]))
     else:
         serial_write(str([1,0,0,speed]))
     #right and left
-
 def rotation_v(speed):
     if speed>0:
         serial_write(str([2,1,0,speed]))
@@ -78,12 +78,12 @@ def translation_sx(distance):
         serial_write(str([1,1,1,distance]))
     else:
         serial_write(str([1,0,1,distance]))
-        
+
 def rotation_s(distance):
     if speed>0:
         serial_write(str([2,1,1,distance]))
     else:
-        serial_write(str([2,0,1,distance]))
+        serial_write(str([2,0,1,distance]))'''
 
 """def elevator(state):
     #only for manual bot
@@ -108,7 +108,7 @@ def grab(state):
 #legacy function
 
 ######## End of Driving function ########
-
+'''
 def serial_read():
     global ser
     while True:
@@ -125,7 +125,7 @@ def serial_read():
         if len(rl)>0:
             rl = rl.strip()
         print("Recieved: "+rl)
-        return rl
+        return rl'''
 #reads line, returns the data after printing it on the console
     
 if __name__ == '__main__':
