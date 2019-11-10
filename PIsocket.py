@@ -1,8 +1,12 @@
+print('importing')
 import socket
+print('imported socket')
 import time
+print('imported time')
 import Serial
+print('imported Serial')
 import json
-
+print('done import')
 
 class Client(object):
 
@@ -15,8 +19,9 @@ class Client(object):
         while True:
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                print("establishing connection")
                 sock.connect((self.hostname,self.port))
-
+                print('conected!')
                 data = json.loads(sock.recv(1024).decode("utf-8"))
 
                 moving = 1
@@ -70,8 +75,9 @@ class Client(object):
 
 
 def init():
-    
-    pi = Client('localhost', 6969)
+    print('start')
+    #Serial.setup()
+    pi = Client('172.16.0.126', 6783)
     pi.start()
-
+    
 init()

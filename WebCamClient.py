@@ -14,7 +14,7 @@ rawCapture = PiRGBArray(camera)
 print('initializing completed')
 print('establishing connection')
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(('192.168.2.38', 8554))
+client_socket.connect(('172.16.0.126', 8554))
 print('connected')
 connection = client_socket.makefile('wb')
 

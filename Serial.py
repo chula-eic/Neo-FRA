@@ -130,8 +130,6 @@ def serial_read():
     
 if __name__ == '__main__':
     setup()
-
-while 1:
     x, y, z = [int(e) for e in input().strip().split()]
     translation(x,y,z)
 
