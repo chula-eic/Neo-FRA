@@ -13,7 +13,7 @@ def handleCon(con,addr):
         global JoyHandler
 
         JoyHandler.handle_joy()
-
+        
         data = bytes(json.dumps(JoyHandler.event), encoding='utf8')
         con.send(data)
     
@@ -101,17 +101,8 @@ class Server(object):
                     
 
         
-                
-
-def init():
-    global JoyHandler
+if __name__ == "__main__":
     JoyHandler = JoyHandler()
     ser = Server('0.0.0.0', 6783)
     ser.start()
-    if(JoyHandler.joystick_count == 0):
-        print("No joystick found!")
-        exit(1)
-
-init()
-
 

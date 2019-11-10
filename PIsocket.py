@@ -10,6 +10,7 @@ class Client(object):
     def start(self):
 
         while True:
+            
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.hostname,self.port))
@@ -68,9 +69,6 @@ class Client(object):
                 sock.close()
 
 
-def init():
-    
-    pi = Client('192.168.56.1', 6783)
-    pi.start()
-
-init()
+if __name__ == "__main__":
+    client = Client('192.168.56.1', 6783)
+    client.start()
