@@ -70,5 +70,6 @@ class Client(object):
 
 
 if __name__ == "__main__":
+    #Serial.setup()
     client = Client('192.168.56.1', 6783)
     client.start()
