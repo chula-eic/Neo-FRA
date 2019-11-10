@@ -54,7 +54,6 @@ class JoyHandler(object):
                     self.event['axes'][j] = -MAX_SPEED
                 if j % 2 == 1:
                     self.event['axes'][j] *= -1
-                self.event['axes'][j] = int(self.event['axes'][j])
 
             buttons = joystick.get_numbuttons()
             self.event['button'] = {}
@@ -72,7 +71,6 @@ class JoyHandler(object):
                     self.speed += 50
                     if self.speed > MAX_SPEED:
                         self.speed = MAX_SPEED
-                self.event['button'][but_num] = int(self.event['button'][but_num])
 
             hats = joystick.get_numhats()
             self.event['hats'] = {}
@@ -80,7 +78,6 @@ class JoyHandler(object):
                 self.event['hats'][hat_num] = list(joystick.get_hat(hat_num))
                 for hat in self.event['hats'][hat_num]:
                     self.event['hats'][hat_num][hat] *= self.speed
-                    self.event['hats'][hat_num][hat] = int(self.event['hats'][hat_num][hat])
 
 
 class Server(object):
