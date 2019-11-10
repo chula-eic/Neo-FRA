@@ -13,6 +13,7 @@ def handleCon(con, addr, joy):
         joy.handle_joy()
 
         data = bytes(json.dumps(joy.event), encoding='utf8')
+        print(data)
         con.send(data)
 
 
@@ -29,7 +30,7 @@ class JoyHandler(object):
     def __init__(self):
         pygame.init()
         pygame.joystick.init()
-        self.speed = MAX_SPEED // 2
+        self.speed = MAX_SPEED
         self.event = {}
         self.count = 0
         self.joystick_count = pygame.joystick.get_count()
@@ -54,23 +55,15 @@ class JoyHandler(object):
                     self.event['axes'][j] = -MAX_SPEED
                 if j % 2 == 1:
                     self.event['axes'][j] *= -1
-
+                self.event['axes'][j] = int(self.event['axes'][j])
             buttons = joystick.get_numbuttons()
             self.event['button'] = {}
             for but_num in range(buttons):
-                if but_num < 4:
+                if but_num >= 4:
                     if but_num % 2 == 1:
-                        self.event['button'][but_num] = joystick.get_button(but_num) * self.speed
-                    else:
                         self.event['button'][but_num] = joystick.get_button(but_num)
-                elif but_num % 2 == 1 and joystick.get_button(but_num) == 1:
-                    self.speed -= 50
-                    if self.speed < 0:
-                        self.speed = 0
-                elif but_num % 2 == 0 and joystick.get_button(but_num) == 1:
-                    self.speed += 50
-                    if self.speed > MAX_SPEED:
-                        self.speed = MAX_SPEED
+
+                #self.event['button'][but_num] = int(self.event['button'][but_num])
 
             hats = joystick.get_numhats()
             self.event['hats'] = {}
@@ -78,6 +71,7 @@ class JoyHandler(object):
                 self.event['hats'][hat_num] = list(joystick.get_hat(hat_num))
                 for hat in self.event['hats'][hat_num]:
                     self.event['hats'][hat_num][hat] *= self.speed
+                    #self.event['hats'][hat_num][hat] = int(self.event['hats'][hat_num][hat])
 
 
 class Server(object):
