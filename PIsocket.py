@@ -16,7 +16,7 @@ class Client(object):
                 sock.connect((self.hostname,self.port))
                 #print('conected!')
                 data = json.loads(sock.recv(1024).decode("utf-8"))
-                
+                #print(data)
                 moving = 1
                 rotation = 1
                 elevator = 1
@@ -52,16 +52,10 @@ class Client(object):
 
 
                 if rotation:
-                    if data['button']['1'] != 0 or data['button']['3'] != 0:
-                        if data['button']['1'] != 0:
-                            z = data['button']['1']
-                        else:
-                            z = data['button']['3']*(-1)
-                    else:
-                        z = data['axes']['2']
+                    z = data['axes']['2']
                 else:
                     z = 0
-                Serial.translation(x, y, z)
+                Serial.translation(int(-x/1.25), int(-y/1.25), -z//2)
                 if elevator:       
                     if data['button']['5']:
                         Serial.elevator(1)
@@ -71,6 +65,7 @@ class Client(object):
                         Serial.elevator(0)
             except Exception as e:
                 print(e)
+                #pass
 
             finally:
                 sock.close()

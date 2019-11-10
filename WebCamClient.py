@@ -32,14 +32,14 @@ while True:
     #ret, frame = cam.read()
     frame = np.empty((240, 320, 3), dtype=np.uint8)
     camera.capture(frame, 'bgr')
-    print(frame.shape)
+    #print(frame.shape)
     result, frame = cv2.imencode('.jpg', frame, encode_param)
 #    data = zlib.compress(pickle.dumps(frame, 0))
     data = pickle.dumps(frame, 0)
     size = len(data)
 
 
-    print("{}: {}".format(img_counter, size))
+    #print("{}: {}".format(img_counter, size))
     client_socket.sendall(struct.pack(">L", size) + data)
     img_counter += 1
 
