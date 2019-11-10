@@ -4,14 +4,17 @@
 import serial
 import time
 
-PORT = 'COM10'
+
+PORT = '/dev/ttyACM0'
+
 ser = None
 
 
 def setup():
     global ser
-    #ser = serial.Serial(PORT, 115200, timeout=1)
+    ser = serial.Serial(PORT, 115200, timeout=1)
     time.sleep(0.6)        #wait for arduino to setup, not really neccessary
+    ser.close()
     #st = serial_read()
     #while not st == "1":
     #    st = serial_read()  #wait "1" from arduino to confirm connection
@@ -25,6 +28,7 @@ def serial_write(s):
     print(s.encode())
     ser.write(s.encode())
     ser.close()
+    #return serial_read()
 #write data and returns the feedback msg from arduino
 
 ######## Driving Function Start Here ########
@@ -129,7 +133,7 @@ def serial_read():
 #reads line, returns the data after printing it on the console
 
 if __name__ == '__main__':
-    #setup()
+    setup()
 
     while 1:
         x, y, z = [int(e) for e in input().strip().split()]
