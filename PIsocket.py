@@ -1,7 +1,4 @@
-import socket
-import time
-import Serial
-import json
+import socket, time, Serial, json
 
 
 class Client(object):
@@ -13,6 +10,7 @@ class Client(object):
     def start(self):
 
         while True:
+            
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((self.hostname,self.port))
@@ -60,6 +58,8 @@ class Client(object):
                 if elevator:       
                     if data['button']['0']:
                         Serial.elevator(1)
+                    elif data['button']['2']:
+                        Serial.elevator(-1)
                     else:
                         Serial.elevator(0)
             except:
@@ -69,9 +69,6 @@ class Client(object):
                 sock.close()
 
 
-def init():
-    
-    pi = Client('localhost', 6969)
-    pi.start()
-
-init()
+if __name__ == "__main__":
+    client = Client('192.168.56.1', 6783)
+    client.start()
