@@ -6,16 +6,15 @@ NOISE = 0.001
 
 #----------------
 
-def handleCon(con,addr):
+def handleCon(con,addr,joy):
 
     try:
-    
-        global JoyHandler
 
-        JoyHandler.handle_joy()
+        joy.handle_joy()
         
-        data = bytes(json.dumps(JoyHandler.event), encoding='utf8')
+        data = bytes(json.dumps(joy.event), encoding='utf8')
         con.send(data)
+        
     
     except:
         pass
@@ -33,6 +32,7 @@ class JoyHandler(object):
         pygame.joystick.init()
         self.speed = MAX_SPEED//2
         self.event = {}
+        self.count = 0
         self.joystick_count = pygame.joystick.get_count()
 
 
@@ -81,14 +81,15 @@ class JoyHandler(object):
                 self.event['hats'][hat_num] = list(joystick.get_hat(hat_num))
                 for hat in self.event['hats'][hat_num]:
                     self.event['hats'][hat_num][hat] *= self.speed
-                    
+ 
     
 
 class Server(object):
 
-    def __init__(self, hostname, port):
+    def __init__(self, hostname, port, joy):
         self.hostname = hostname
         self.port = port
+        self.joy = joy
 
     def start(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -97,12 +98,12 @@ class Server(object):
 
         while True:
             conn, address = self.socket.accept()
-            handleCon(conn, address)
+            handleCon(conn, address, self.joy)
                     
 
         
 if __name__ == "__main__":
     JoyHandler = JoyHandler()
-    ser = Server('0.0.0.0', 6783)
+    ser = Server('0.0.0.0', 6783, JoyHandler)
     ser.start()
 
