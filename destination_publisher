@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+import rospy
+from std_msgs.msg import String
+
+
+pub = rospy.Publisher('Destination', FloatList, queue_size=10)
+queue = [];  #DECLARE QUEUE/FLOATLIST QUEUE HERE
+
+def callback(data):
+    global pub
+    global queue
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    if data == "red":
+        queue = [] #INSERT RED HERE
+    else if data = "blue":
+        queue = [] #INSERT POS HERE
+    else if data = "green":
+        queue = [] #INSERT POS HERE
+    else if data = "yellow":
+        queue = [] #INSERT POS HERE
+    pub.publish(queue[0])
+    if len(queue) == 1:
+        queue = []
+    else:
+        queue = queue[1:]
+
+def feedback(data):
+    global pub
+    global queue
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    if data == "1":
+        if queue != []:
+            pub.publish(queue[0])
+            queue = []
+        else:
+            print("Destinatoin Reached")
+    else:
+        print("FAILED")
+        
+def subs_color():
+    rospy.init_node('des', anonymous=True)
+    rospy.Subscriber("Color", String, callback)
+    rospy.Subscriber("DestFeedback", String, feedback)
+
+    rospy.spin()
+
+if __name__ == '__main__':
+    try:
+        listener()
+    except rospy.ROSInterruptException:
+        pass
