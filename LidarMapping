@@ -1,0 +1,7 @@
+file = open("LidarMap.txt") #insert file name here
+def map(data): #insert data here
+    while #NOT DEAD:
+        global file
+        file.write(file, str(data.x)+" "+str(data.y)+"\n")
+        
+#ask nicky why it's still only these codes
