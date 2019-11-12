@@ -55,7 +55,7 @@ class Client(object):
                     z = data['axes']['2']
                 else:
                     z = 0
-                Serial.translation(int(-x/1.25), int(y/1.25), -z//2)
+                Serial.translation(int(x/1.25), int(-y/1.25), -z//2)
                 if elevator:       
                     if data['button']['5']:
                         Serial.elevator(1)
