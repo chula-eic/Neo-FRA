@@ -72,11 +72,11 @@ class Client(object):
     
 
 
-def init():
+def start(IP, PORT):
     print('start')
     Serial.setup()
-    pi = Client('172.16.0.126', 6783)
+    pi = Client(IP, PORT)
     pi.start()
     
 if __name__ == "__main__":
-    init()
+    start('172.16.0.126', 6783)

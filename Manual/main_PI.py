@@ -1,4 +1,3 @@
-#import _thread
 from multiprocessing import Process
 import PCsocket
 import WebCamServer
