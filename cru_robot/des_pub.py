@@ -22,17 +22,16 @@ def callback(data):
 		elif data.data == "yellow":
 			queue = [[5,5]] #INSERT POS HERE
 		state = 1
-		print(queue[-1])
-		pub.publish(queue[-1])
-		queue.pop()
+	if state == 1:
+            pub.publish(queue[-1])
+
 
 def feedback(data):
     global pub
     global queue
     if data.data == "1":
         if len(queue) > 0 : 
-	    pub.publish(queue[-1])
-            queue.pop()
+	    pub.publish(queue.pop())
         else:
 	    servo_pub.publish("1")
             print("Destinatoin Reached")
@@ -42,7 +41,7 @@ def feedback(data):
 def des_pub():
     rospy.init_node('des_pub', anonymous=True)
     rospy.Subscriber("color", String, callback)
-    rospy.Subscriber("desfeedback", String, feedback)
+    rospy.Subscriber("Feedback", String, feedback)
 
     rospy.spin()
 
