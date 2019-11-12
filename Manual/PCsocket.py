@@ -88,9 +88,11 @@ class Server(object):
             handleCon(conn, address, self.joy)
 
 def start(port):
+    print("PC socket starting")
     Joy = JoyHandler()
     ser = Server('0.0.0.0', port, Joy)
     ser.start()
+
 
 if __name__ == "__main__":
     start(6783)

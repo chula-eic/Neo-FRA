@@ -8,18 +8,18 @@ class CamServer(object):
         self.HOST = '0.0.0.0'
         self.PORT = port
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print('Socket created')
+        #print('Socket created')
 
         self.s.bind((self.HOST, self.PORT))
-        print('Socket bind complete')
+        #print('Socket bind complete')
         self.s.listen(10)
-        print('Socket now listening')
+        #print('Socket now listening')
 
         self.conn, self.addr = self.s.accept()
 
         self.data = b""
         self.payload_size = struct.calcsize(">L")
-        print("payload_size: {}".format(self.payload_size))
+        #print("payload_size: {}".format(self.payload_size))
     def receive(self, data, conn, payload_size):
         while(1):
             while len(data) < payload_size:
@@ -45,6 +45,7 @@ class CamServer(object):
                 break
 
 def start(port):
+    print('Cam server starting')
     CServer = CamServer(port)
     CServer.receive(CServer.data, CServer.conn, CServer.payload_size)
 
