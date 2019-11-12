@@ -9,7 +9,6 @@ NOISE = 0.001
 
 def handleCon(con, addr, joy):
     try:
-
         joy.handle_joy()
 
         data = bytes(json.dumps(joy.event), encoding='utf8')
@@ -58,7 +57,7 @@ class JoyHandler(object):
             buttons = joystick.get_numbuttons()
             self.event['button'] = {}
             for but_num in range(buttons):
-                if 4 <= but_num < 8:
+                if 1 <= but_num < 8:
                     self.event['button'][but_num] = joystick.get_button(but_num)
 
                 #self.event['button'][but_num] = int(self.event['button'][but_num])
@@ -88,8 +87,12 @@ class Server(object):
             conn, address = self.socket.accept()
             handleCon(conn, address, self.joy)
 
+def start(port):
+    print("PC socket starting")
+    Joy = JoyHandler()
+    ser = Server('0.0.0.0', port, Joy)
+    ser.start()
+
 
 if __name__ == "__main__":
-    JoyHandler = JoyHandler()
-    ser = Server('0.0.0.0', 6783, JoyHandler)
-    ser.start()
+    start(6783)
