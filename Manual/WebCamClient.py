@@ -32,7 +32,7 @@ class CamClient(object):
 
         #self.encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
 
-    def transmit(self, camera, encode_param, client_socket):
+    def transmit(self, camera, client_socket):
         while True:
             #ret, frame = cam.read()
             frame = np.empty((120, 160, 3), dtype=np.uint8)
@@ -52,7 +52,7 @@ class CamClient(object):
 
 def start(IP, PORT):
     CClient = CamClient(IP, PORT)
-    CClient.transmit(CClient.camera, CClient.encode_param, CClient.client_socket)
+    CClient.transmit(CClient.camera, CClient.client_socket)
 
 if __name__ == '__main__':
     start('172.16.0.126', 8554)
