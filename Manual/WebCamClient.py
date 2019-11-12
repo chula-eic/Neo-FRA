@@ -3,7 +3,6 @@ import socket
 import struct
 import pickle
 
-from numba.pycc import CC
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import time
