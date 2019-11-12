@@ -11,7 +11,7 @@ import numpy as np
 class CamClient(object):
     def __init__(self, IP, PORT):
         self.camera = PiCamera()
-        self.camera.resolution = (160, 120)
+        self.camera.resolution = (160, 128)
         self.camera.framerate = 24
         rawCapture = PiRGBArray(self.camera)
         #print('initializing completed')
@@ -35,7 +35,7 @@ class CamClient(object):
     def transmit(self, camera, client_socket):
         while True:
             #ret, frame = cam.read()
-            frame = np.empty((120, 160, 3), dtype=np.uint8)
+            frame = np.empty((128, 160, 3), dtype=np.uint8)
             camera.capture(frame, 'bgr')
             #print(frame.shape)
             result, frame = cv2.imencode('.jpg', frame)

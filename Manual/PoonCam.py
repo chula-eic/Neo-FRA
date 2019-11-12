@@ -90,12 +90,12 @@ running = True
 def worker():
     global cur_image
     camera = PiCamera()
-    camera.resolution = (160, 120)
+    camera.resolution = (160, 128)
     camera.framerate = 24
     rawCapture = PiRGBArray(camera)
     print('Start Capturing...')
     while running:
-        img = np.empty((120, 160, 3), dtype=np.uint8)
+        img = np.empty((128, 160, 3), dtype=np.uint8)
         camera.capture(img, 'bgr')
         cur_image = img
         with new_img_ev:
