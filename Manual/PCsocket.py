@@ -9,7 +9,6 @@ NOISE = 0.001
 
 def handleCon(con, addr, joy):
     try:
-
         joy.handle_joy()
 
         data = bytes(json.dumps(joy.event), encoding='utf8')
@@ -88,8 +87,10 @@ class Server(object):
             conn, address = self.socket.accept()
             handleCon(conn, address, self.joy)
 
+def start(port):
+    Joy = JoyHandler()
+    ser = Server('0.0.0.0', port, Joy)
+    ser.start()
 
 if __name__ == "__main__":
-    JoyHandler = JoyHandler()
-    ser = Server('0.0.0.0', 6783, JoyHandler)
-    ser.start()
+    start(6783)
