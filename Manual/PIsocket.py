@@ -52,10 +52,16 @@ class Client(object):
 
 
                 if rotation:
-                    z = data['axes']['2']
+                    if data['button']['1'] != 0 | data['button']['3'] != 0:
+                        if data['button']['1'] != 0:
+                            z = 1
+                        elif data['button']['3'] != 0:
+                            z = -1
+                    else:
+                        z = data['axes']['2']
                 else:
                     z = 0
-                Serial.translation(int(-x/1.25), int(-y/1.25), -z//2)
+                Serial.translation(int(-x/1.25), int(y/1.25), -z//2)
                 if elevator:       
                     if data['button']['5']:
                         Serial.elevator(1)

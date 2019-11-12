@@ -57,7 +57,7 @@ class JoyHandler(object):
             buttons = joystick.get_numbuttons()
             self.event['button'] = {}
             for but_num in range(buttons):
-                if 4 <= but_num < 8:
+                if 1 <= but_num < 8:
                     self.event['button'][but_num] = joystick.get_button(but_num)
 
                 #self.event['button'][but_num] = int(self.event['button'][but_num])
