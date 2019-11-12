@@ -1,0 +1,51 @@
+spd = "500" #translation spd
+rsp = "200" #rotation spd
+PORT = '/dev/ttyACM0'
+ser = serial.Serial(PORT, 115200, timeout=1)
+import rospy
+import serial
+def call(data):
+    global ser
+    if data.name == "X":
+        if data.num <0:
+            s = "!1"+spd+"00000000"
+        else if data.num > 0:
+            s = "!0"+spd+"00000000"
+        else:
+            s = "!000000000000"
+        ser.write(s.encode())
+        sleep(data.num)
+        ser.write("!000000000000".encode())
+    else if data.name == "Y":
+        if data.num <0:
+            s = "!00001"+spd+"0000"
+        else if data.num > 0:
+            s = "!00000"+spd+"0000"
+        else:
+            s = "!000000000000"
+        ser.write(s.encode())
+        sleep(data.num)
+        ser.write("!000000000000".encode())
+    else if data.name == "R":   #fix if rotates wrong way
+        if data.num != 0:
+            s = "!000000001"+rsp
+        else:
+            s = "!000000000000"
+        ser.write(s.encode())
+        sleep(data.num)
+        ser.write("!000000000000".encode())
+    else if data.name == "L":   #here too
+        if data.num != 0:
+            s = "!000000000"+rsp
+        else:
+            s = "!000000000000"
+        ser.write(s.encode())
+        sleep(data.num)
+        ser.write("!000000000000".encode())
+    else if data.name == "servo":
+        servo(data.num)         #SERVO CTRL HERE
+    
+def subs_color():
+    rospy.init_node('ctrl', anonymous=True)
+    rospy.Subscriber("command", command, call)
+    rospy.spin()
