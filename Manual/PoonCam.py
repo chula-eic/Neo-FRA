@@ -13,7 +13,7 @@ stream_framerate = 0
 stream_target_size = (0, 99999)
 
 jpeg = TurboJPEG(
-    lib_path='turbojpeg.dll' if platform.system() == 'Windows' else '/usr/lib/x86_64-linux-gnu/libturbojpeg.so.0')
+    lib_path='turbojpeg.dll' if platform.system() == 'Windows' else '/opt/libjpeg-turbo/lib32/libturbojpeg.so.0')
 
 app = Flask(__name__, static_url_path='', template_folder='static')
 
