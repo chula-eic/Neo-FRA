@@ -5,7 +5,7 @@ import serial
 from std_msgs.msg import String
 
 PORT = '/dev/ttyACM0'
-pub = rospy.Publisher('Feedback', String, queue_size=10)
+pub = rospy.Publisher('feedback', String, queue_size=10)
 queue = []
 des = []
 pos = []
@@ -17,14 +17,13 @@ def DestCall(data):
     if data != queue:
         cacheerr = [0,0]
     update_err()
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    queue = data
     
 
 def PoseCall(data):
     global pub,error,pos
     pos = data
     update_err()
-    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     
 def update_err():
     error = [des[i]-pos[i] for i in (0,1)]
@@ -35,15 +34,15 @@ def update_err():
         ser.write(positionctrl_isr(error))
     
 def subs_color():
-    rospy.init_node('des', anonymous=True)
-    rospy.Subscriber("Pose", FloatList, PoseCall)
-    rospy.Subscriber("Dest", FloatList, DestCall)
+    rospy.init_node('dest_pub', anonymous=True)
+    rospy.Subscriber("pose", FloatList, PoseCall)
+    rospy.Subscriber("dest", FloatList, DestCall)
     rospy.spin()
 
 kp = 1
-ki = 1
+ki = 0.2
 kd = 1
-lim = 10
+lim = 5
 cacheerr = i = [0,0]
 
 def positionctrl_isr(err) :
