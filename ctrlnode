@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+import rospy
+import serial
+
+from std_msgs.msg import String
+
+PORT = '/dev/ttyACM0'
+pub = rospy.Publisher('Feedback', String, queue_size=10)
+queue = []
+des = []
+pos = []
+error = []
+ser = serial.Serial(PORT, 115200, timeout=1)
+def DestCall(data):
+    global pub,error,cacheerr,des
+    des = data
+    if data != queue:
+        cacheerr = [0,0]
+    update_err()
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    
+
+def PoseCall(data):
+    global pub,error,pos
+    pos = data
+    update_err()
+    rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
+    
+def update_err():
+    error = [des[i]-pos[i] for i in (0,1)]
+    if abs(error[1]) < 0.01 and abs(error[2]) < 0.01:
+        ser.write(positionctrl_isr([0,0]))
+        pub.publish("1")
+    else:
+        ser.write(positionctrl_isr(error))
+    
+def subs_color():
+    rospy.init_node('des', anonymous=True)
+    rospy.Subscriber("Pose", FloatList, PoseCall)
+    rospy.Subscriber("Dest", FloatList, DestCall)
+    rospy.spin()
+
+kp = 1
+ki = 1
+kd = 1
+lim = 10
+cacheerr = i = [0,0]
+
+def positionctrl_isr(err) :
+    global cacheerr,i
+    p = [err[e] * kp for e in (0,1)]
+    d = [(err[e] - cacheerr[e]) * kd for e in (0,1)]
+    for e in (0,1):
+        if -lim < err[e] < lim:
+            i[e] += err[e] * ki
+    cacheerr = err
+    return [p[e] + d[e] + i[e] for e in (0,1)]
