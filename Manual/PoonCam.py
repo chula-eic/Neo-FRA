@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from cheroot.wsgi import Server, PathInfoDispatcher
 from flask import Flask, send_file, Response, request, abort
+import numpy as np
 import cv2
 import io
 import platform
@@ -8,7 +9,8 @@ from turbojpeg import TurboJPEG
 import threading
 import time
 import sys
-
+from picamera.array import PiRGBArray
+from picamera import PiCamera
 stream_framerate = 0
 stream_target_size = (0, 99999)
 
@@ -87,25 +89,19 @@ running = True
 
 def worker():
     global cur_image
-    if len(sys.argv) > 1:
-        cam = cv2.VideoCapture(int(sys.argv[1]))
-    else:
-        cam = cv2.VideoCapture(0)
-    if len(sys.argv) > 3:
-        cam.set(cv2.CAP_PROP_FRAME_WIDTH, int(sys.argv[2]))
-        cam.set(cv2.CAP_PROP_FRAME_HEIGHT, int(sys.argv[3]))
+    camera = PiCamera()
+    camera.resolution = (160, 120)
+    camera.framerate = 24
+    rawCapture = PiRGBArray(camera)
     print('Start Capturing...')
     while running:
-        ret, img = cam.read()
-        if not ret:
-            cam.release()
-            raise Exception('Cannot get image')
+        img = np.empty((120, 160, 3), dtype=np.uint8)
+        camera.capture(img, 'bgr')
         cur_image = img
         with new_img_ev:
             new_img_ev.notify_all()
     with new_img_ev:
         new_img_ev.notify_all()
-    cam.release()
 
 
 def stop_capture():
